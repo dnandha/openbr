@@ -24,6 +24,7 @@ using namespace cv;
 namespace br
 {
 
+// TODO: Port to CV4
 /*!
  * \ingroup transforms
  * \brief Wraps OpenCV's multi-layer perceptron framework
@@ -35,7 +36,6 @@ namespace br
  * \br_property QStringList inputVariables Metadata keys for the labels associated with each template. There should be the same number of keys in the list as there are neurons in the final layer. Default is QStringList().
  * \br_property QStringList outputVariables Metadata keys to store the output of the neural network. There should be the same number of keys in the list as there are neurons in the final layer. Default is QStringList().
  * \br_property QList<int> neuronsPerLayer The number of neurons in each layer of the net. Default is QList<int>() << 1 << 1.
- */
 class MLPTransform : public MetaTransform
 {
     Q_OBJECT
@@ -119,6 +119,7 @@ private:
 
 BR_REGISTER(Transform, MLPTransform)
 
+*/
 } // namespace br
 
 #include "classification/mlp.moc"

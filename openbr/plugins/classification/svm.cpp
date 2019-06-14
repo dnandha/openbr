@@ -25,7 +25,7 @@ using namespace cv;
 
 namespace br
 {
-
+// TODO: Port to CV4
 /*!
  * \ingroup transforms
  * \brief Wraps OpenCV's SVM framework.
@@ -45,7 +45,6 @@ namespace br
  * \br_property int termCriteria The maximum number of training iterations. Default is 1000.
  * \br_property int folds Cross validation parameter used for autoselecting other parameters. Default is 5.
  * \br_property bool balanceFolds If true and the problem is 2-class classification then more balanced cross validation subsets are created. Default is false.
- */
 class SVMTransform : public Transform
 {
     Q_OBJECT
@@ -185,6 +184,7 @@ private:
 
 BR_REGISTER(Transform, SVMTransform)
 
+*/
 } // namespace br
 
 #include "classification/svm.moc"

@@ -21,10 +21,14 @@
 #include <QDebug>
 #include <QString>
 #include <QStringList>
-#include <opencv2/core/core.hpp>
-#include <opencv2/ml/ml.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/ml.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 #include <assert.h>
 #include <openbr/openbr_plugin.h>
+
+#include "old_ml.hpp"
 
 namespace OpenCVUtils
 {
@@ -52,9 +56,9 @@ namespace OpenCVUtils
     QStringList matrixToStringList(const cv::Mat &m);
 
     // Model storage
-    void storeModel(const CvStatModel &model, QDataStream &stream);
+    void storeModel(const cv::ml::StatModel &model, QDataStream &stream);
     void storeModel(const cv::Algorithm &model, QDataStream &stream);
-    void loadModel(CvStatModel &model, QDataStream &stream);
+    void loadModel(cv::ml::StatModel &model, QDataStream &stream);
     void loadModel(cv::Algorithm &model, QDataStream &stream);
 
     template <typename T>

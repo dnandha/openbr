@@ -8,6 +8,8 @@ using namespace cv;
 namespace br
 {
 
+// TODO: Port to CV4
+/*
 struct Node
 {
     float value; // for leaf nodes
@@ -82,6 +84,7 @@ static void storeRecursive(QDataStream &stream, const Node *node, int maxCatCoun
         storeRecursive(stream, node->right, maxCatCount);
     }
 }
+*/
 
 /*!
  * \brief A classification wrapper on OpenCV's CvBoost class. It uses CvBoost for training a boosted forest and then performs classification using the trained nodes.
@@ -94,7 +97,6 @@ static void storeRecursive(QDataStream &stream, const Node *node, int maxCatCoun
  * \br_property int maxDepth The maximum depth for each trained tree
  * \br_property int maxWeakCount The maximum number of trees in the forest
  * \br_property Type type. The type of boosting to perform. Options are [Discrete, Real, Logit, Gentle]. Gentle is the default.
- */
 class BoostedForestClassifier : public Classifier
 {
     Q_OBJECT
@@ -222,6 +224,7 @@ private:
 
 BR_REGISTER(Classifier, BoostedForestClassifier)
 
+*/
 } // namespace br
 
 #include "classification/boostedforest.moc"

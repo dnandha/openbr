@@ -9,11 +9,11 @@ using namespace cv;
 namespace br
 {
 
+// TODO: Port to CV4
 /*!
  * \ingroup Distances
  * \brief SVM Regression on Template absolute differences.
  * \author Josh Klontz \cite jklontz
- */
 class SVMDistance : public Distance
 {
     Q_OBJECT
@@ -126,6 +126,7 @@ private:
 
 BR_REGISTER(Distance, SVMDistance)
 
+*/
 } // namespace br
 
 #include "distance/svm.moc"

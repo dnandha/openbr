@@ -1,7 +1,7 @@
 #include "openbr/plugins/openbr_internal.h"
 #include "openbr/core/opencvutils.h"
 
-#include <opencv2/contrib/contrib.hpp>
+//#include <opencv2/contrib.hpp>
 
 using namespace cv;
 
@@ -29,7 +29,7 @@ class HeatmapTransform : public UntrainableTransform
         applyColorMap(src,buffer,COLORMAP_JET);
 
         Mat colored;
-        cvtColor(src, colored, CV_GRAY2BGR);
+        cvtColor(src, colored, COLOR_GRAY2BGR);
 
         addWeighted(colored,alpha,buffer,beta,0.0,dst);
     }

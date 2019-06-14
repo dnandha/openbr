@@ -58,14 +58,14 @@ class DrawTransform : public UntrainableTransform
             const QList<Point2f> pointsList = (named) ? OpenCVUtils::toPoints(src.file.points()+src.file.namedPoints()) : OpenCVUtils::toPoints(src.file.points());
             for (int i=0; i<pointsList.size(); i++) {
                 const Point2f &point = pointsList[i];
-                circle(dst, point, 3, color, -1);
+                circle(dst.m(), point, 3, color, -1);
                 QString label = (location) ? QString("%1,(%2,%3)").arg(QString::number(i),QString::number(point.x),QString::number(point.y)) : QString("%1").arg(QString::number(i));
-                if (verbose) putText(dst, label.toStdString(), point, FONT_HERSHEY_SIMPLEX, 0.5, verboseColor, 1);
+                if (verbose) putText(dst.m(), label.toStdString(), point, FONT_HERSHEY_SIMPLEX, 0.5, verboseColor, 1);
             }
         }
         if (rects) {
             foreach (const Rect &rect, OpenCVUtils::toRects(src.file.namedRects() + src.file.rects()))
-                rectangle(dst, rect, color, lineThickness);
+                rectangle(dst.m(), rect, color, lineThickness);
         }
     }
 };

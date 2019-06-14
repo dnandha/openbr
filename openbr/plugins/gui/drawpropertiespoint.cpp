@@ -74,7 +74,7 @@ class DrawPropertiesPointTransform : public UntrainableTransform
         if (outString.empty())
             return;
 
-        putText(dst, outString, cvPoint, FONT_HERSHEY_SIMPLEX, 0.5, textColor, 1);
+        putText(dst.m(), outString, cvPoint, FONT_HERSHEY_SIMPLEX, 0.5, textColor, 1);
     }
 
 };

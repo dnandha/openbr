@@ -14,6 +14,7 @@
  * limitations under the License.                                            *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include <opencv2/imgproc.hpp>
 #include <openbr/plugins/openbr_internal.h>
 
 using namespace cv;

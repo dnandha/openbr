@@ -41,7 +41,44 @@ class KeyPointDescriptorTransform : public UntrainableTransform
 
     void init()
     {
-        descriptorExtractor = DescriptorExtractor::create(descriptor.toStdString());
+        // todo: directly cast string to template/class
+        std::string descriptorName = descriptor.toStdString();
+        if (descriptorName == "BRISK")
+        {
+            descriptorExtractor = BRISK::create();
+        }
+        else if (descriptorName == "ORB")
+        {
+            descriptorExtractor = ORB::create();
+        }
+        else if (descriptorName == "MSER")
+        {
+            descriptorExtractor = MSER::create();
+        }
+        else if (descriptorName == "KAZE")
+        {
+            descriptorExtractor = KAZE::create();
+        }
+        else if (descriptorName == "AKAZE")
+        {
+            descriptorExtractor = AKAZE::create();
+        }
+        else if (descriptorName == "GFTTDetector")
+        {
+            descriptorExtractor = GFTTDetector::create();
+        }
+        else if (descriptorName == "FastFeatureDetector")
+        {
+            descriptorExtractor = FastFeatureDetector::create();
+        }
+        else if (descriptorName == "AgastFeatureDetector")
+        {
+            descriptorExtractor = AgastFeatureDetector::create();
+        }
+        else if (descriptorName == "SimpleBlobDetector")
+        {
+            descriptorExtractor = SimpleBlobDetector::create();
+        }
         if (descriptorExtractor.empty())
             qFatal("Failed to create DescriptorExtractor: %s", qPrintable(descriptor));
     }

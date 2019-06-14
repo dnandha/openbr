@@ -22,6 +22,7 @@ using namespace cv;
 namespace br
 {
 
+// TODO: Port to CV4
 /*!
  * \ingroup transforms
  * \brief Wraps OpenCV's Ada Boost framework
@@ -37,7 +38,6 @@ namespace br
  * \br_property overwriteMat bool If true, the output template will be a 1x1 matrix with value equal to the confidence or classification (depending on returnConfidence). If false the output template will be the same as the input template. Default is true.
  * \br_property inputVariable QString Metadata variable storing the label for each template. Default is "Label".
  * \br_property outputVariable QString Metadata variable to store the confidence or classification of each template (depending on returnConfidence). If overwriteMat is true nothing will be written here. Default is "".
- */
 class AdaBoostTransform : public Transform
 {
     Q_OBJECT
@@ -56,18 +56,13 @@ class AdaBoostTransform : public Transform
     Q_PROPERTY(QString outputVariable READ get_outputVariable WRITE set_outputVariable RESET reset_outputVariable STORED false)
 
 public:
-    enum Type { Discrete = CvBoost::DISCRETE,
-                Real = CvBoost::REAL,
-                Logit = CvBoost::LOGIT,
-                Gentle = CvBoost::GENTLE};
-
     enum SplitCriteria { Default = CvBoost::DEFAULT,
                          Gini = CvBoost::GINI,
                          Misclass = CvBoost::MISCLASS,
                          Sqerr = CvBoost::SQERR};
 
 private:
-    BR_PROPERTY(Type, type, Real)
+    BR_PROPERTY(ml::Boost::Types, type, ml::Boost::Types::REAL)
     BR_PROPERTY(SplitCriteria, splitCriteria, Default)
     BR_PROPERTY(int, weakCount, 100)
     BR_PROPERTY(float, trimRate, .95)
@@ -86,8 +81,8 @@ private:
         Mat labels = OpenCVUtils::toMat(File::get<float>(data, inputVariable));
 
         Mat types = Mat(samples.cols + 1, 1, CV_8U);
-        types.setTo(Scalar(CV_VAR_NUMERICAL));
-        types.at<char>(samples.cols, 0) = CV_VAR_CATEGORICAL;
+        types.setTo(Scalar(ml::VAR_NUMERICAL));
+        types.at<char>(samples.cols, 0) = ml::VAR_CATEGORICAL;
 
         CvBoostParams params;
         params.boost_type = type;
@@ -97,7 +92,7 @@ private:
         params.cv_folds = folds;
         params.max_depth = maxDepth;
 
-        boost.train( samples, CV_ROW_SAMPLE, labels, Mat(), Mat(), types, Mat(),
+        boost.train( samples, ml::ROW_SAMPLE, labels, Mat(), Mat(), types, Mat(),
                     params);
     }
 
@@ -139,6 +134,7 @@ private:
 
 BR_REGISTER(Transform, AdaBoostTransform)
 
+*/
 } // namespace br
 
 #include "classification/adaboost.moc"

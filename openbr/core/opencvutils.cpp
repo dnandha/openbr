@@ -14,12 +14,6 @@
  * limitations under the License.                                            *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/highgui/highgui_c.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/imgproc/imgproc_c.h>
-#include <openbr/openbr_plugin.h>
-
 #include "opencvutils.h"
 #include "qtutils.h"
 
@@ -30,13 +24,13 @@ using namespace std;
 
 int OpenCVUtils::getFourcc()
 {
-    int fourcc = CV_FOURCC('x','2','6','4');
+    int fourcc = VideoWriter::fourcc('x','2','6','4');
     QVariant recovered_variant = br::Globals->property("fourcc");
 
     if (!recovered_variant.isNull()) {
         QString recovered_string = recovered_variant.toString();
         if (recovered_string.length() == 4) {
-            fourcc = CV_FOURCC(recovered_string[0].toLatin1(),
+            fourcc = VideoWriter::fourcc(recovered_string[0].toLatin1(),
                                recovered_string[1].toLatin1(),
                                recovered_string[2].toLatin1(),
                                recovered_string[3].toLatin1());
@@ -77,7 +71,7 @@ void OpenCVUtils::showImage(const Mat &src, const QString &window, bool waitKey)
 
 void OpenCVUtils::cvtGray(const Mat &src, Mat &dst)
 {
-    if      (src.channels() == 3) cvtColor(src, dst, CV_BGR2GRAY);
+    if      (src.channels() == 3) cvtColor(src, dst, COLOR_BGR2GRAY);
     else if (src.channels() == 1) dst = src;
     else                          qFatal("Invalid channel count");
 }
@@ -263,7 +257,7 @@ QStringList OpenCVUtils::matrixToStringList(const Mat &m)
     return results;
 }
 
-void OpenCVUtils::storeModel(const CvStatModel &model, QDataStream &stream)
+void OpenCVUtils::storeModel(const ml::StatModel &model, QDataStream &stream)
 {
     // Create local file
     QTemporaryFile tempFile;
@@ -299,7 +293,7 @@ void OpenCVUtils::storeModel(const cv::Algorithm &model, QDataStream &stream)
     stream << data;
 }
 
-void OpenCVUtils::loadModel(CvStatModel &model, QDataStream &stream)
+void OpenCVUtils::loadModel(ml::StatModel &model, QDataStream &stream)
 {
     // Copy local file contents from stream
     QByteArray data;
@@ -312,7 +306,39 @@ void OpenCVUtils::loadModel(CvStatModel &model, QDataStream &stream)
     tempFile.close();
 
     // Load MLP from local file
-    model.load(qPrintable(tempFile.fileName()));
+    // todo: infer class without test-casting
+    if (dynamic_cast<ml::NormalBayesClassifier*> (&model) != nullptr)
+    {
+        model.load<ml::NormalBayesClassifier>(qPrintable(tempFile.fileName()));
+    }
+    else if (dynamic_cast<ml::KNearest*> (&model) != nullptr)
+    {
+        model.load<ml::KNearest>(qPrintable(tempFile.fileName()));
+    }
+    else if (dynamic_cast<ml::SVM*> (&model) != nullptr)
+    {
+        model.load<ml::SVM>(qPrintable(tempFile.fileName()));
+    }
+    else if (dynamic_cast<ml::EM*> (&model) != nullptr)
+    {
+        model.load<ml::EM>(qPrintable(tempFile.fileName()));
+    }
+    else if (dynamic_cast<ml::DTrees*> (&model) != nullptr)
+    {
+        model.load<ml::DTrees>(qPrintable(tempFile.fileName()));
+    }
+    else if (dynamic_cast<ml::ANN_MLP*> (&model) != nullptr)
+    {
+        model.load<ml::ANN_MLP>(qPrintable(tempFile.fileName()));
+    }
+    else if (dynamic_cast<ml::LogisticRegression*> (&model) != nullptr)
+    {
+        model.load<ml::LogisticRegression>(qPrintable(tempFile.fileName()));
+    }
+    else if (dynamic_cast<ml::SVMSGD*> (&model) != nullptr)
+    {
+        model.load<ml::SVMSGD>(qPrintable(tempFile.fileName()));
+    }
 }
 
 void OpenCVUtils::loadModel(cv::Algorithm &model, QDataStream &stream)

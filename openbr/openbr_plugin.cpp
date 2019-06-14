@@ -1155,7 +1155,9 @@ void Object::init(const File &file_)
 /* Context - public methods */
 bool br::Context::contains(const QString &name)
 {
-    return property(qPrintable(name)).isValid();
+    const char* s = qPrintable(name);
+    QVariant q = property(s);
+    return q.isValid();
 }
 
 void br::Context::printStatus()
@@ -1609,7 +1611,7 @@ Transform *Transform::make(QString str, QObject *parent)
 
     if (transform->independent) {
         File independent(".Independent");
-        independent.set("transform", qVariantFromValue<void*>(transform));
+        independent.set("transform", QVariant::fromValue(transform));
         transform = Factory<Transform>::make(independent);
     }
 

@@ -122,7 +122,7 @@ class SlidingWindowTransform : public MetaTransform
                         continue;
 
                     Mat scaledImage(scaledImageSize, CV_8U, imageBuffer.data);
-                    resize(m, scaledImage, scaledImageSize, 0, 0, CV_INTER_LINEAR);
+                    resize(m, scaledImage, scaledImageSize, 0, 0, INTER_LINEAR);
                     Mat repImage = classifier->preprocess(scaledImage);
 
                     int step = factor > 2. ? 1 : 2;

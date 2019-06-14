@@ -104,10 +104,12 @@
 
 #include <iostream>
 #include <stdarg.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/nonfree/nonfree.hpp>
+#include <opencv2/core/hal/hal.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/xfeatures2d/nonfree.hpp>
 
 using namespace cv;
+using namespace std;
 
 /******************************* Defs and macros *****************************/
 
@@ -270,9 +272,9 @@ static void calcSIFTDescriptor( const Mat& img, Point2f ptf, float ori, float sc
         }
 
     len = k;
-    fastAtan2(Y, X, Ori, len, true);
-    magnitude(X, Y, Mag, len);
-    exp(W, W, len);
+    hal::fastAtan32f(Y, X, Ori, len, true);
+    hal::magnitude32f(X, Y, Mag, len);
+    hal::exp32f(W, W, len);
 
     for( k = 0; k < len; k++ )
     {
@@ -388,7 +390,7 @@ static int descriptorSize(int bins, int width)
 static void extractSIFT(const Mat &image, vector<KeyPoint> &keypoints, Mat &descriptors, int nOctaveLayers, double sigma, int bins, int width)
 {
     if( image.empty() || image.depth() != CV_8U )
-        CV_Error( CV_StsBadArg, "image is empty or has incorrect depth (!=CV_8U)" );
+        CV_Error( Error::Code::StsBadArg, "image is empty or has incorrect depth (!=CV_8U)" );
 
     int firstOctave = 0, actualNOctaves = 0, actualNLayers = 0, maxOctave = INT_MIN;
     for (size_t i=0; i<keypoints.size(); i++) {

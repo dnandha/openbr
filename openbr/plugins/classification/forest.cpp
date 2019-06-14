@@ -22,6 +22,7 @@ using namespace cv;
 namespace br
 {
 
+// TODO: Port to CV4
 /*!
  * \ingroup transforms
  * \brief Wraps OpenCV's random trees framework
@@ -38,7 +39,6 @@ namespace br
  * \br_property QString outputVariable The metadata key for the forest response if overwriteMat is false. Default is "".
  * \br_property bool weight If true and classification is true the random forest will use prior accuracies. Default is false.
  * \br_property enum termCrit Termination criteria for training the random forest. Options are Iter, EPS and Both. Iter terminates when the maximum number of trees is reached. EPS terminates when forestAccuracy is met. Both terminates when either is true. Default is Iter.
- */
 class ForestTransform : public Transform
 {
     Q_OBJECT
@@ -183,13 +183,13 @@ protected:
 
 BR_REGISTER(Transform, ForestTransform)
 
+*/
 /*!
  * \ingroup transforms
  * \brief Wraps OpenCV's random trees framework to induce features
  * \author Scott Klum \cite sklum
  * \br_link https://lirias.kuleuven.be/bitstream/123456789/316661/1/icdm11-camready.pdf
  * \br_property bool useRegressionValue SCOTT FILL ME IN.
- */
 class ForestInductionTransform : public ForestTransform
 {
     Q_OBJECT
@@ -277,6 +277,7 @@ class ForestInductionTransform : public ForestTransform
 
 BR_REGISTER(Transform, ForestInductionTransform)
 
+*/
 } // namespace br
 
 #include "classification/forest.moc"

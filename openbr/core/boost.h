@@ -1,9 +1,13 @@
 #ifndef _BOOST_H_
 #define _BOOST_H_
 
-#include "ml.h"
-#include <time.h>
+// TODO: Port to CV4
+/*
+#include <opencv2/imgproc/imgproc.hpp>
 #include <openbr/openbr_plugin.h>
+#include <time.h>
+
+#include "old_ml.hpp"
 
 #ifdef _WIN32
 #define TIME( arg ) (((double) clock()) / CLOCKS_PER_SEC)
@@ -80,5 +84,6 @@ protected:
 
 } // namespace br
 
-#endif
+*/
 
+#endif

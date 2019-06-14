@@ -14,11 +14,12 @@
  * limitations under the License.                                            *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgproc.hpp>
 
 #include <openbr/plugins/openbr_internal.h>
 
 using namespace cv;
+using namespace std;
 
 namespace br
 {
@@ -37,10 +38,10 @@ class ConvexHullTransform : public UntrainableTransform
     Q_PROPERTY(int minSize READ get_minSize WRITE set_minSize RESET reset_minSize STORED false)
 
 public:
-    enum Approximation { None = CV_CHAIN_APPROX_NONE,
-                  Simple = CV_CHAIN_APPROX_SIMPLE,
-                  L1 = CV_CHAIN_APPROX_TC89_L1,
-                  KCOS = CV_CHAIN_APPROX_TC89_KCOS };
+    enum Approximation { None = CHAIN_APPROX_NONE,
+                  Simple = CHAIN_APPROX_SIMPLE,
+                  L1 = CHAIN_APPROX_TC89_L1,
+                  KCOS = CHAIN_APPROX_TC89_KCOS };
 
 private:
     BR_PROPERTY(Approximation, approximation, None)
@@ -53,7 +54,7 @@ private:
         vector<vector<Point> > contours;
         vector<Vec4i> hierarchy;
 
-        findContours(src.m(), contours, hierarchy, CV_RETR_EXTERNAL, approximation);
+        findContours(src.m(), contours, hierarchy, RETR_EXTERNAL, approximation);
 
         vector<vector<Point> >hull( contours.size() );
         for( size_t i = 0; i < contours.size(); i++ )
@@ -61,7 +62,7 @@ private:
 
         for(size_t i=0; i<contours.size(); i++)
             if (contours[i].size() > (size_t)minSize)
-                drawContours(dst, hull, i, Scalar(255,255,255), CV_FILLED);
+                drawContours(dst.m(), hull, i, Scalar(255,255,255), FILLED);
     }
 };
 

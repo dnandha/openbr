@@ -40,7 +40,45 @@ class KeyPointDetectorTransform : public UntrainableTransform
 
     void init()
     {
-        featureDetector = FeatureDetector::create(detector.toStdString());
+        // todo: directly cast string to template/class
+        std::string detectorName = detector.toStdString();
+        if (detectorName == "BRISK")
+        {
+            featureDetector = BRISK::create();
+        }
+        else if (detectorName == "ORB")
+        {
+            featureDetector = ORB::create();
+        }
+        else if (detectorName == "MSER")
+        {
+            featureDetector = MSER::create();
+        }
+        else if (detectorName == "KAZE")
+        {
+            featureDetector = KAZE::create();
+        }
+        else if (detectorName == "AKAZE")
+        {
+            featureDetector = AKAZE::create();
+        }
+        else if (detectorName == "GFTTDetector")
+        {
+            featureDetector = GFTTDetector::create();
+        }
+        else if (detectorName == "FastFeatureDetector")
+        {
+            featureDetector = FastFeatureDetector::create();
+        }
+        else if (detectorName == "AgastFeatureDetector")
+        {
+            featureDetector = AgastFeatureDetector::create();
+        }
+        else if (detectorName == "SimpleBlobDetector")
+        {
+            featureDetector = SimpleBlobDetector::create();
+        }
+
         if (featureDetector.empty())
             qFatal("Failed to create KeyPointDetector: %s", qPrintable(detector));
     }

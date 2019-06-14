@@ -2,7 +2,7 @@
 #include "openbr/core/opencvutils.h"
 #include "openbr/core/eigenutils.h"
 
-#include <opencv2/contrib/contrib.hpp>
+#include <opencv2/xfeatures2d.hpp>
 
 #include <Eigen/Dense>
 

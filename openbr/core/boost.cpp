@@ -1,8 +1,8 @@
-#include <opencv2/imgproc/imgproc.hpp>
+﻿#include "boost.h"
+//#include "cxmisc.h"
 
-#include "boost.h"
-#include "cxmisc.h"
-
+// TODO: Port to CV4
+/*
 using namespace std;
 using namespace br;
 using namespace cv;
@@ -17,9 +17,20 @@ logRatio( double val )
     return log( val/(1. - val) );
 }
 
-#define CV_CMP_NUM_IDX(i,j) (aux[i] < aux[j])
-static CV_IMPLEMENT_QSORT_EX( icvSortIntAux, int, CV_CMP_NUM_IDX, const float* )
-static CV_IMPLEMENT_QSORT_EX( icvSortUShAux, unsigned short, CV_CMP_NUM_IDX, const float* )
+template<typename T, typename Idx>
+class LessThanIdx
+{
+public:
+    LessThanIdx( const T* _arr ) : arr(_arr) {}
+    bool operator()(Idx a, Idx b) const { return arr[a] < arr[b]; }
+    const T* arr;
+};
+
+static inline int cvAlign( int size, int align )
+{
+    CV_DbgAssert( (align & (align-1)) == 0 && size < INT_MAX );
+    return (size + align - 1) & -align;
+}
 
 #define CV_THRESHOLD_EPS (0.00001F)
 
@@ -33,13 +44,13 @@ static int CV_CDECL icvCmpIntegers( const void* a, const void* b )
     return *(const int*)a - *(const int*)b;
 }
 
-static CvMat* cvPreprocessIndexArray( const CvMat* idx_arr, int data_arr_size, bool check_for_duplicates=false, const int channels = 1 )
+static CvMat* cvPreprocessIndexArray( const CvMat* idx_arr, int data_arr_size, bool check_for_duplicates=false )
 {
     CvMat* idx = 0;
 
     CV_FUNCNAME( "cvPreprocessIndexArray" );
 
-    __BEGIN__;
+    __CV_BEGIN__;
 
     int i, idx_total, idx_selected = 0, step, type, prev = INT_MIN, is_sorted = 1;
     uchar* srcb = 0;
@@ -59,7 +70,10 @@ static CvMat* cvPreprocessIndexArray( const CvMat* idx_arr, int data_arr_size, b
     type = CV_MAT_TYPE(idx_arr->type);
     step = CV_IS_MAT_CONT(idx_arr->type) ? 1 : idx_arr->step/CV_ELEM_SIZE(type);
 
-    if (type == CV_8UC(channels) || type == CV_8SC1) {
+    switch( type )
+    {
+    case CV_8UC1:
+    case CV_8SC1:
         // idx_arr is array of 1's and 0's -
         // i.e. it is a mask of the selected components
         if( idx_total != data_arr_size )
@@ -71,7 +85,9 @@ static CvMat* cvPreprocessIndexArray( const CvMat* idx_arr, int data_arr_size, b
 
         if( idx_selected == 0 )
             CV_ERROR( CV_StsOutOfRange, "No components/input_variables is selected!" );
-    } else if (type == CV_32SC(channels)) {
+
+        break;
+    case CV_32SC1:
         // idx_arr is array of integer indices of selected components
         if( idx_total > data_arr_size )
             CV_ERROR( CV_StsOutOfRange,
@@ -88,15 +104,16 @@ static CvMat* cvPreprocessIndexArray( const CvMat* idx_arr, int data_arr_size, b
             }
             prev = val;
         }
-    } else {
+        break;
+    default:
         CV_ERROR( CV_StsUnsupportedFormat, "Unsupported index array data type "
                                            "(it should be 8uC1, 8sC1 or 32sC1)" );
     }
 
-    CV_CALL( idx = cvCreateMat( 1, idx_selected, CV_32SC(channels) ));
+    CV_CALL( idx = cvCreateMat( 1, idx_selected, CV_32SC1 ));
     dsti = idx->data.i;
 
-    if( type < CV_32SC(channels) )
+    if( type < CV_32SC1 )
     {
         for( i = 0; i < idx_total; i++ )
             if( srcb[i*step] )
@@ -121,13 +138,14 @@ static CvMat* cvPreprocessIndexArray( const CvMat* idx_arr, int data_arr_size, b
         }
     }
 
-    __END__;
+    __CV_END__;
 
     if( cvGetErrStatus() < 0 )
         cvReleaseMat( &idx );
 
     return idx;
 }
+
 
 //------------------------------------- FeatureEvaluator ---------------------------------------
 
@@ -199,6 +217,7 @@ struct CascadeBoostTrainData : CvDTreeTrainData
     CvMat _resp; // for casting
     int numPrecalcVal, numPrecalcIdx, channels;
 };
+
 
 CvDTreeNode* CascadeBoostTrainData::subsample_data( const CvMat* _subsample_idx )
 {
@@ -485,7 +504,7 @@ void CascadeBoostTrainData::setData( const FeatureEvaluator* _featureEvaluator,
     }
     var_type->data.i[var_count] = cat_var_count;
     var_type->data.i[var_count+1] = cat_var_count+1;
-    work_var_count = ( cat_var_count ? 0 : numPrecalcIdx ) + 1/*cv_lables*/;
+    work_var_count = ( cat_var_count ? 0 : numPrecalcIdx ) + 1;
     buf_count = 2;
 
     buf_size = -1; // the member buf_size is obsolete
@@ -655,7 +674,7 @@ void CascadeBoostTrainData::get_ord_var_data( CvDTreeNode* n, int vi, float* ord
                 sampleValues[i] = (*featureEvaluator)( vi, sampleIndices[i]);
             }
         }
-        icvSortIntAux( sortedIndicesBuf, nodeSampleCount, &sampleValues[0] );
+        std::sort(sortedIndicesBuf, sortedIndicesBuf + nodeSampleCount, LessThanIdx<float, int>(&sampleValues[0]) );
         for( int i = 0; i < nodeSampleCount; i++ )
             ordValuesBuf[i] = (&sampleValues[0])[sortedIndicesBuf[i]];
         *sortedIndices = sortedIndicesBuf;
@@ -698,6 +717,7 @@ float CascadeBoostTrainData::getVarValue( int vi, int si )
     return (*featureEvaluator)( vi, si );
 }
 
+
 struct FeatureIdxOnlyPrecalc : ParallelLoopBody
 {
     FeatureIdxOnlyPrecalc( const FeatureEvaluator* _featureEvaluator, CvMat* _buf, int _sample_count, bool _is_buf_16u )
@@ -723,9 +743,9 @@ struct FeatureIdxOnlyPrecalc : ParallelLoopBody
                     *(idst + fi*sample_count + si) = si;
             }
             if ( is_buf_16u )
-                icvSortUShAux( udst + fi*sample_count, sample_count, valCachePtr );
+                std::sort(udst + (size_t)fi*sample_count, udst + (size_t)(fi + 1)*sample_count, LessThanIdx<float, unsigned short>(valCachePtr) );
             else
-                icvSortIntAux( idst + fi*sample_count, sample_count, valCachePtr );
+                std::sort(idst + (size_t)fi*sample_count, idst + (size_t)(fi + 1)*sample_count, LessThanIdx<float, int>(valCachePtr) );
         }
     }
     const FeatureEvaluator* featureEvaluator;
@@ -759,9 +779,9 @@ struct FeatureValAndIdxPrecalc : ParallelLoopBody
                     *(idst + fi*sample_count + si) = si;
             }
             if ( is_buf_16u )
-                icvSortUShAux( udst + fi*sample_count, sample_count, valCache->ptr<float>(fi) );
-            else
-                icvSortIntAux( idst + fi*sample_count, sample_count, valCache->ptr<float>(fi) );
+                    std::sort(udst + (size_t)fi*sample_count, udst + (size_t)(fi + 1)*sample_count, LessThanIdx<float, unsigned short>(valCache->ptr<float>(fi)) );
+                else
+                    std::sort(idst + (size_t)fi*sample_count, idst + (size_t)(fi + 1)*sample_count, LessThanIdx<float, int>(valCache->ptr<float>(fi)) );
         }
     }
     const FeatureEvaluator* featureEvaluator;
@@ -801,7 +821,7 @@ void CascadeBoostTrainData::precalculate()
     parallel_for_( Range(0, minNum),
                    FeatureValAndIdxPrecalc(featureEvaluator, buf, &valCache, sample_count, is_buf_16u!=0) );
     parallel_for_( Range(minNum, numPrecalcVal),
-                   FeatureValOnlyPrecalc(featureEvaluator, &valCache, sample_count) );        
+                   FeatureValOnlyPrecalc(featureEvaluator, &valCache, sample_count) );
     cout << "Precalculation time: " << (proctime + TIME( 0 )) << endl;
 }
 
@@ -1394,3 +1414,4 @@ bool CascadeBoost::isErrDesired()
 
     return falseAlarm <= maxFalseAlarm;
 }
+*/
